@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Propiedad {
+  id            Int      @id @default(autoincrement())
+  titulo        String
+  descripcion   String
+  precio        Float
+  direccion     String
+  zona          String
+  metros        Int
+  habitaciones  Int
+  banos         Int
+  tipo          String   // piso, casa, chalet, etc.
+  estado        String   // en venta, vendido, reservado
+  imagenes      String[] // URLs de las imágenes
+  destacado     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  historialPrecios HistorialPrecio[]
+  visitas      Visita[]
+}
+
+model Cliente {
+  id          Int      @id @default(autoincrement())
+  nombre      String
+  email       String   @unique
+  telefono    String
+  dni         String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  visitas     Visita[]
+}
+
+model HistorialPrecio {
+  id          Int      @id @default(autoincrement())
+  propiedadId Int
+  precio      Float
+  fecha       DateTime @default(now())
+  propiedad   Propiedad @relation(fields: [propiedadId], references: [id])
+}
+
+model Visita {
+  id          Int      @id @default(autoincrement())
+  propiedadId Int
+  clienteId   Int
+  fecha       DateTime
+  notas       String?
+  estado      String   // programada, realizada, cancelada
+  propiedad   Propiedad @relation(fields: [propiedadId], references: [id])
+  cliente     Cliente   @relation(fields: [clienteId], references: [id])
+}
